@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dapur Kucing Comel - Cute Cat Kitchen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(135deg, #fff1f2 0%, #fef3c7 50%, #e0f2fe 100%);
+        }
+        .btn-bounce {
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.1s;
+        }
+        .btn-bounce:active {
+            transform: scale(0.92);
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+        @keyframes steam {
+            0% { transform: translateY(0) scale(1); opacity: 0.7; }
+            50% { transform: translateY(-10px) scale(1.2); opacity: 0.4; }
+            100% { transform: translateY(-20px) scale(1.4); opacity: 0; }
+        }
+        .animate-steam {
+            animation: steam 1.5s infinite ease-out;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-30px) scale(1.2); opacity: 0; }
+        }
+        .float-heart {
+            position: absolute;
+            animation: floatHeart 1s forwards ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-between p-2 sm:p-4 overflow-hidden text-slate-800">
+
+    <!-- Header Dashboard -->
+    <header class="w-full max-w-5xl flex justify-between items-center px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-pink-100 z-10">
+        <div class="flex items-center gap-2">
+            <div class="relative text-3xl sm:text-4xl">
+                👨‍🍳
+                <span class="absolute -top-1 -right-1 text-sm">🐱</span>
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-amber-500 bg-clip-text text-transparent leading-tight">
+                    Dapur Kucing Comel
+                </h1>
+                <p class="text-xs text-slate-400 hidden sm:block">Sediakan makanan lazat untuk pelanggan kucing!</p>
+            </div>
+        </div>
+
+        <!-- Stats & Counter -->
+        <div class="flex items-center gap-3 sm:gap-6">
+            <div class="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
+                <span class="text-xl">🪙</span>
+                <div>
+                    <div class="text-[10px] font-semibold text-amber-600 uppercase leading-none">Syiling</div>
+                    <span id="coinsDisplay" class="text-base sm:text-xl font-bold text-amber-600">0</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 bg-pink-50 px-3 py-1.5 rounded-xl border border-pink-200">
+                <span class="text-xl">⭐</span>
+                <div>
+                    <div class="text-[10px] font-semibold text-pink-600 uppercase leading-none">Skor</div>
+                    <span id="scoreDisplay" class="text-base sm:text-xl font-bold text-pink-600">0</span>
+                </div>
+            </div>
+
+            <button id="shopBtn" class="btn-bounce bg-purple-500 hover:bg-purple-600 text-white font-bold px-3 py-2 rounded-xl shadow flex items-center gap-1 text-xs sm:text-sm">
+                <span>🛍️</span> <span class="hidden sm:inline">Kedai</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Workspace -->
+    <main class="w-full max-w-5xl flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 my-2 min-h-0 relative">
+        
+        <!-- KIRI: Kaunter Pelanggan Kucing (5 Cols) -->
+        <section class="lg:col-span-5 bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-pink-100 flex flex-col justify-between relative overflow-hidden">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="font-bold text-slate-700 flex items-center gap-2">
+                    <span>🐾</span> Pelanggan Menunggu
+                </h2>
+                <span id="comboBadge" class="hidden bg-gradient-to-r from-amber-400 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-bounce">
+                    Combo x2! 🔥
+                </span>
+            </div>
+
+            <!-- Senarai Pelanggan -->
+            <div id="customerQueue" class="flex-1 flex flex-col gap-3 justify-center items-center py-2 relative min-h-[220px]">
+                <!-- Pelanggan akan di-generate secara dinamik di sini -->
+            </div>
+
+            <!-- Petua Pantas -->
+            <div class="bg-pink-50/70 p-2.5 rounded-2xl border border-pink-100 text-xs text-pink-700 flex items-center gap-2">
+                <span class="text-lg">💡</span>
+                <span>Siapkan resipi mengikut langkah di sebelah kanan & tekan <b>Hidang</b>!</span>
+            </div>
+        </section>
+
+        <!-- KANAN: Dapur & Stesen Memasak (7 Cols) -->
+        <section class="lg:col-span-7 bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-pink-100 flex flex-col justify-between gap-3 overflow-y-auto custom-scroll">
+            
+            <!-- Resipi Aktif & Pilihan Resipi -->
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold uppercase text-slate-400">Pilih Resipi Diusahakan:</span>
+                    <span id="outfitBadge" class="text-xs bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full font-semibold">
+                        Topi: Chef Asas 👨‍🍳
+                    </span>
+                </div>
+                <div id="recipeSelector" class="flex gap-2 overflow-x-auto pb-2 custom-scroll">
+                    <!-- Senarai Resipi (Kad Mini) -->
+                </div>
+            </div>
+
+            <!-- Kawasan Kerja Utama (Prep & Cook Canvas/UI) -->
+            <div class="bg-slate-50 border-2 border-dashed border-pink-200 rounded-2xl p-4 flex flex-col items-center justify-center relative min-h-[240px]">
+                
+                <!-- Status Pinggan Semasa -->
+                <div class="w-full flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span id="recipeIcon" class="text-3xl">🍱</span>
+                        <div>
+                            <h3 id="recipeTitle" class="font-bold text-slate-800 text-sm sm:text-base">Sushi Kucing Comel</h3>
+                            <p id="recipeDesc" class="text-xs text-slate-400">Potong bahan → Masak → Hidang</p>
+                        </div>
+                    </div>
+                    <button id="resetPrepBtn" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-2.5 py-1 rounded-lg">
+                        Buang / Reset 🗑️
+                    </button>
+                </div>
+
+                <!-- Interactive Cook/Prep Workspace -->
+                <div class="w-full flex-1 flex flex-col items-center justify-center gap-3">
+                    
+                    <!-- Display Makanan Dalam Pembentukan -->
+                    <div class="relative w-32 h-32 bg-white rounded-full border-4 border-amber-200 shadow-inner flex items-center justify-center">
+                        <div id="plateContent" class="text-5xl transition-all duration-300 transform scale-100">
+                            🥗
+                        </div>
+                        <!-- Kesan Steam / Asap -->
+                        <div id="steamEffect" class="absolute -top-4 flex gap-1 hidden">
+                            <span class="animate-steam text-xs">💨</span>
+                            <span class="animate-steam text-xs" style="animation-delay: 0.3s">💨</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar & Indicator Zon Keemasan -->
+                    <div class="w-full max-w-xs space-y-1">
+                        <div class="flex justify-between text-xs font-bold text-slate-500">
+                            <span id="stepLabel">Langkah 1: Potong Bahan</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="w-full h-4 bg-slate-200 rounded-full overflow-hidden relative border border-slate-300">
+                            <!-- Golden Zone Target Indicator -->
+                            <div id="goldenZone" class="absolute top-0 bottom-0 bg-emerald-300/60 border-x-2 border-emerald-500 hidden" style="left: 60%; width: 25%;"></div>
+                            <!-- Current Progress Bar -->
+                            <div id="cookingProgress" class="h-full bg-gradient-to-r from-pink-400 to-amber-400 w-0 transition-all duration-150"></div>
+                        </div>
+                    </div>
+
+                    <!-- Butang Interaktif Memasak (Tap/Cook) -->
+                    <div class="flex gap-3 w-full max-w-xs mt-1">
+                        <button id="actionBtn" class="btn-bounce flex-1 py-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-2 border-b-4 border-pink-700">
+                            <span id="actionIcon">🔪</span>
+                            <span id="actionText">Potong! (Tap)</span>
+                        </button>
+                        
+                        <button id="serveBtn" disabled class="btn-bounce py-3 px-5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl shadow-md border-b-4 border-emerald-700 disabled:border-slate-400">
+                            Hidang 🍽️
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer Status / Kucing Chef -->
+    <footer class="w-full max-w-5xl bg-white/80 backdrop-blur-md rounded-2xl px-4 py-2 border border-pink-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="text-3xl animate-bounce">🐱‍🍳</div>
+            <div class="text-xs">
+                <span class="font-bold text-pink-600">Chef Meow:</span>
+                <span id="chefQuote" class="text-slate-500">"Meow! Semua hidangan siap dihidangkan segar!"</span>
+            </div>
+        </div>
+        <div class="text-xs text-slate-400 hidden sm:block">
+            Dapur Kucing Comel v1.0 • Web Audio Enabled
+        </div>
+    </footer>
+
+    <!-- Overlay Shop Modal -->
+    <div id="shopModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border-4 border-purple-200 relative animate-fade-in">
+            <button id="closeShopBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+            
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-3xl">🛍️</span>
+                <div>
+                    <h3 class="text-xl font-bold text-purple-700">Kedai Naik Taraf Chef</h3>
+                    <p class="text-xs text-slate-400">Beli peralatan & topi comel baru!</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 max-h-80 overflow-y-auto custom-scroll pr-1">
+                
+                <!-- Upgrade 1: Auto Chopper -->
+                <div class="p-3 bg-purple-50 rounded-2xl border border-purple-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Pisau Kucing Turbo 🔪</div>
+                        <div class="text-xs text-slate-500">Memotong bahan 2x lebih pantas</div>
+                    </div>
+                    <button id="buyKnifeBtn" class="btn-bounce bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1">
+                        <span>50</span> 🪙
+                    </button>
+                </div>
+
+                <!-- Upgrade 2: Dapur Gas Cepat -->
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Dapur Gas Super 🍳</div>
+                        <div class="text-xs text-slate-500">Masa memasak lebih cepat & tepat</div>
+                    </div>
+                    <button id="buyStoveBtn" class="btn-bounce bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1">
+                        <span>80</span> 🪙
+                    </button>
+                </div>
+
+                <!-- Outfit 1: Topi Mahkota -->
+                <div class="p-3 bg-pink-50 rounded-2xl border border-pink-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-700 text-sm">Topi Mahkota Raja 👑</div>
+                        <div class="text-xs text-slate-500">Dapatkan +20% syiling bonus</div>
+                    </div>
+                    <button id="buyCrownBtn" class="btn-bounce bg-pink-600 hover:bg-pink-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1">
+                        <span>150</span> 🪙
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="startOverlay" class="fixed inset-0 bg-pink-500/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border-4 border-pink-200 space-y-4">
+            <div class="text-6xl animate-bounce">🐱‍🍳</div>
+            <h2 class="text-3xl font-bold text-pink-600">Dapur Kucing Comel</h2>
+            <p class="text-slate-500 text-sm">Sediakan pesanan kucing comel sebelum masa kesabaran mereka habis!</p>
+            <button id="startGameBtn" class="btn-bounce w-full py-3.5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-lg rounded-2xl shadow-lg border-b-4 border-pink-700">
+                Mula Memasak! 🐾
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Script Logic -->
+    <script>
+        // --- Web Audio API (Sintesis Kesan Bunyi Audio) ---
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playMeow() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.12);
+                osc.frequency.exponentialRampToValueAtTime(350, this.ctx.currentTime + 0.3);
+
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playChop() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.08);
+            }
+
+            playSizzle() {
+                if (!this.ctx) return;
+                // White noise effect for sizzling
+                const bufferSize = this.ctx.sampleRate * 0.1;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+                noise.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start();
+            }
+
+            playSuccess() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.5);
+            }
+        }
+
+        const audio = new SoundEngine();
+
+        // --- Data Resipi ---
+        const RECIPES = [
+            {
+                id: 'sushi',
+                name: 'Sushi Kucing',
+                icon: '🍱',
+                rawIcon: '🐟',
+                choppedIcon: '🍣',
+                steps: ['POTONG', 'GULUNG'],
+                prepTime: 4
+            },
+            {
+                id: 'burger',
+                name: 'Burger Meow',
+                icon: '🍔',
+                rawIcon: '🥩',
+                choppedIcon: '🧆',
+                steps: ['POTONG', 'MASAK'],
+                prepTime: 6
+            },
+            {
+                id: 'soup',
+                name: 'Sup Ikan Segar',
+                icon: '🍲',
+                rawIcon: '🥕',
+                choppedIcon: '🥣',
+                steps: ['POTONG', 'REDIH'],
+                prepTime: 5
+            },
+            {
+                id: 'boba',
+                name: 'Teh Susu Boba',
+                icon: '🧋',
+                rawIcon: '🧊',
+                choppedIcon: '🧋',
+                steps: ['CAMPUR', 'KOCHOK'],
+                prepTime: 3
+            }
+        ];
+
+        // --- Data Pelanggan Kucing ---
+        const CAT_TYPES = [
+            { name: 'Oyen', avatar: '🐱', bg: 'bg-amber-100', quote: 'Meow! Saya nak makan cepat!' },
+            { name: 'Comel', avatar: '😸', bg: 'bg-pink-100', quote: 'Lapar sangat meoww...' },
+            { name: 'Mochi', avatar: '😻', bg: 'bg-purple-100', quote: 'Makanan paling sedap sila!' },
+            { name: 'Siplah', avatar: '😼', bg: 'bg-emerald-100', quote: 'Saya tunggu dengan sabar meow.' }
+        ];
+
+        // --- State Permainan ---
+        let coins = 0;
+        let score = 0;
+        let combo = 0;
+        let currentRecipe = RECIPES[0];
+        let currentStepIndex = 0;
+        let progress = 0;
+        let isCooking = false;
+        let customers = [];
+        let maxCustomers = 3;
+
+        // Upgrades State
+        let knifeLevel = 1;
+        let stoveLevel = 1;
+        let hasCrown = false;
+
+        // --- Elemen UI ---
+        const coinsDisplay = document.getElementById('coinsDisplay');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const comboBadge = document.getElementById('comboBadge');
+        const customerQueue = document.getElementById('customerQueue');
+        const recipeSelector = document.getElementById('recipeSelector');
+        const recipeTitle = document.getElementById('recipeTitle');
+        const recipeIcon = document.getElementById('recipeIcon');
+        const plateContent = document.getElementById('plateContent');
+        const stepLabel = document.getElementById('stepLabel');
+        const progressPercent = document.getElementById('progressPercent');
+        const cookingProgress = document.getElementById('cookingProgress');
+        const goldenZone = document.getElementById('goldenZone');
+        const actionBtn = document.getElementById('actionBtn');
+        const actionIcon = document.getElementById('actionIcon');
+        const actionText = document.getElementById('actionText');
+        const serveBtn = document.getElementById('serveBtn');
+        const resetPrepBtn = document.getElementById('resetPrepBtn');
+        const chefQuote = document.getElementById('chefQuote');
+        const steamEffect = document.getElementById('steamEffect');
+        const startOverlay = document.getElementById('startOverlay');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const shopModal = document.getElementById('shopModal');
+        const shopBtn = document.getElementById('shopBtn');
+        const closeShopBtn = document.getElementById('closeShopBtn');
+        const buyKnifeBtn = document.getElementById('buyKnifeBtn');
+        const buyStoveBtn = document.getElementById('buyStoveBtn');
+        const buyCrownBtn = document.getElementById('buyCrownBtn');
+        const outfitBadge = document.getElementById('outfitBadge');
+
+        // --- Inisialisasi UI Resipi Selector ---
+        function initRecipeSelector() {
+            recipeSelector.innerHTML = '';
+            RECIPES.forEach(recipe => {
+                const btn = document.createElement('button');
+                btn.className = `btn-bounce flex-shrink-0 p-2 sm:p-2.5 rounded-2xl border ${recipe.id === currentRecipe.id ? 'border-pink-500 bg-pink-50' : 'border-slate-200 bg-white'} flex items-center gap-2 text-xs font-bold`;
+                btn.innerHTML = `<span class="text-xl">${recipe.icon}</span> <span>${recipe.name}</span>`;
+                btn.onclick = () => selectRecipe(recipe);
+                recipeSelector.appendChild(btn);
+            });
+        }
+
+        function selectRecipe(recipe) {
+            currentRecipe = recipe;
+            initRecipeSelector();
+            resetPreparation();
+        }
+
+        // --- Pengurusan Pelanggan ---
+        function spawnCustomer() {
+            if (customers.length >= maxCustomers) return;
+
+            const catInfo = CAT_TYPES[Math.floor(Math.random() * CAT_TYPES.length)];
+            const desiredRecipe = RECIPES[Math.floor(Math.random() * RECIPES.length)];
+            
+            const customer = {
+                id: Date.now() + Math.random(),
+                name: catInfo.name,
+                avatar: catInfo.avatar,
+                bg: catInfo.bg,
+                quote: catInfo.quote,
+                order: desiredRecipe,
+                patience: 100, // %
+                maxPatience: 100
+            };
+
+            customers.push(customer);
+            audio.playMeow();
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            customerQueue.innerHTML = '';
+            
+            if (customers.length === 0) {
+                customerQueue.innerHTML = `<div class="text-slate-400 text-xs italic">Menunggu pelanggan tiba... 🐾</div>`;
+                return;
+            }
+
+            customers.forEach(cust => {
+                const card = document.createElement('div');
+                card.className = `w-full ${cust.bg} p-3 rounded-2xl border border-white/60 shadow-sm flex items-center justify-between gap-3 animate-fade-in relative`;
+                
+                // Color status berdasarkan kesabaran
+                let barColor = 'bg-emerald-400';
+                if (cust.patience < 40) barColor = 'bg-red-400';
+                else if (cust.patience < 70) barColor = 'bg-amber-400';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <div class="text-4xl animate-pulse">${cust.avatar}</div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-xs flex items-center gap-1">
+                                <span>${cust.name}</span>
+                            </div>
+                            <div class="text-[11px] text-pink-600 font-semibold flex items-center gap-1 mt-0.5">
+                                <span>Nak:</span> <span class="text-base">${cust.order.icon}</span> <b>${cust.order.name}</b>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bar Kesabaran -->
+                    <div class="w-20 sm:w-24">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 mb-0.5">
+                            <span>Masa</span>
+                            <span>${Math.ceil(cust.patience)}%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-white/80 rounded-full overflow-hidden border border-slate-200">
+                            <div class="h-full ${barColor} transition-all duration-300" style="width: ${cust.patience}%"></div>
+                        </div>
+                    </div>
+                `;
+                customerQueue.appendChild(card);
+            });
+        }
+
+        // Loop Kesabaran Pelanggan
+        setInterval(() => {
+            if (startOverlay.classList.contains('hidden')) {
+                customers.forEach((cust, index) => {
+                    cust.patience -= 1.2;
+                    if (cust.patience <= 0) {
+                        // Pelanggan Merajuk & Lari
+                        customers.splice(index, 1);
+                        combo = 0;
+                        updateComboUI();
+                        chefQuote.textContent = `"Aduhai, pelanggan dah merajuk lari! 😿"`;
+                        renderCustomers();
+                    }
+                });
+                renderCustomers();
+
+                // Spawn Pelanggan Baru secara berkala
+                if (Math.random() < 0.35 && customers.length < maxCustomers) {
+                    spawnCustomer();
+                }
+            }
+        }, 1000);
+
+        // --- Pengurusan Penyediaan Makanan ---
+        function resetPreparation() {
+            currentStepIndex = 0;
+            progress = 0;
+            isCooking = false;
+            plateContent.textContent = currentRecipe.rawIcon;
+            recipeTitle.textContent = currentRecipe.name;
+            recipeIcon.textContent = currentRecipe.icon;
+            updateStepUI();
+            serveBtn.disabled = true;
+            steamEffect.classList.add('hidden');
+        }
+
+        function updateStepUI() {
+            const currentStep = currentRecipe.steps[currentStepIndex];
+            
+            if (!currentStep) {
+                // Siap Seutuhnya!
+                stepLabel.textContent = "Hidangan Siap! ✨";
+                progressPercent.textContent = "100%";
+                cookingProgress.style.width = "100%";
+                actionBtn.disabled = true;
+                serveBtn.disabled = false;
+                plateContent.textContent = currentRecipe.icon;
+                audio.playSuccess();
+                createFloatingHearts();
+                return;
+            }
+
+            actionBtn.disabled = false;
+            stepLabel.textContent = `Langkah ${currentStepIndex + 1}: ${currentStep}`;
+            progressPercent.textContent = `${Math.floor(progress)}%`;
+            cookingProgress.style.width = `${progress}%`;
+
+            if (currentStep === 'POTONG' || currentStep === 'CAMPUR') {
+                actionIcon.textContent = '🔪';
+                actionText.textContent = `${currentStep}! (Tap)`;
+                goldenZone.classList.add('hidden');
+                steamEffect.classList.add('hidden');
+            } else if (currentStep === 'MASAK' || currentStep === 'GULUNG' || currentStep === 'REDIH' || currentStep === 'KOCHOK') {
+                actionIcon.textContent = '🔥';
+                actionText.textContent = `${currentStep}! (Tekan)`;
+                goldenZone.classList.remove('hidden');
+                steamEffect.classList.remove('hidden');
+            }
+        }
+
+        // Action Tap/Cook Listener
+        actionBtn.addEventListener('click', () => {
+            const currentStep = currentRecipe.steps[currentStepIndex];
+            if (!currentStep) return;
+
+            if (currentStep === 'POTONG' || currentStep === 'CAMPUR') {
+                audio.playChop();
+                progress += (18 * knifeLevel);
+                plateContent.classList.add('scale-110');
+                setTimeout(() => plateContent.classList.remove('scale-110'), 100);
+
+                if (progress >= 100) {
+                    progress = 0;
+                    currentStepIndex++;
+                    plateContent.textContent = currentRecipe.choppedIcon;
+                }
+                updateStepUI();
+            } else {
+                // Cooking gauge action
+                audio.playSizzle();
+                progress += (12 * stoveLevel);
+
+                if (progress >= 60 && progress <= 85) {
+                    // Golden Zone Hit
+                    chefQuote.textContent = `"Hampir siap di zon keemasan! 🔥"`;
+                }
+
+                if (progress >= 100) {
+                    progress = 0;
+                    currentStepIndex++;
+                }
+                updateStepUI();
+            }
+        });
+
+        // Hidang Makanan kepada Pelanggan
+        serveBtn.addEventListener('click', () => {
+            // Cari pelanggan yang memesan resipi ini
+            const targetIndex = customers.findIndex(c => c.order.id === currentRecipe.id);
+
+            if (targetIndex !== -1) {
+                // Berjaya Hidang!
+                const servedCat = customers[targetIndex];
+                let earnedCoins = 20;
+                if (hasCrown) earnedCoins = Math.floor(earnedCoins * 1.2);
+                
+                coins += earnedCoins;
+                score += 100 + (combo * 20);
+                combo++;
+
+                coinsDisplay.textContent = coins;
+                scoreDisplay.textContent = score;
+                updateComboUI();
+
+                chefQuote.textContent = `"${servedCat.name} sangat gembira! +${earnedCoins} syiling 🪙"`;
+                audio.playSuccess();
+
+                customers.splice(targetIndex, 1);
+                renderCustomers();
+                resetPreparation();
+            } else {
+                // Salah Hidangan
+                chefQuote.textContent = `"Tiada pelanggan yang nak ${currentRecipe.name} sekarang! 😿"`;
+                combo = 0;
+                updateComboUI();
+            }
+        });
+
+        resetPrepBtn.addEventListener('click', resetPreparation);
+
+        function updateComboUI() {
+            if (combo > 1) {
+                comboBadge.textContent = `Combo x${combo}! 🔥`;
+                comboBadge.classList.remove('hidden');
+            } else {
+                comboBadge.classList.add('hidden');
+            }
+        }
+
+        // Effect Partikel Hati Comel
+        function createFloatingHearts() {
+            for (let i = 0; i < 5; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'float-heart text-xl';
+                heart.textContent = '💖';
+                heart.style.left = `${45 + (Math.random() * 20 - 10)}%`;
+                heart.style.top = `40%`;
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 1000);
+            }
+        }
+
+        // --- Kedai & Upgrades ---
+        shopBtn.onclick = () => shopModal.classList.remove('hidden');
+        closeShopBtn.onclick = () => shopModal.classList.add('hidden');
+
+        buyKnifeBtn.onclick = () => {
+            if (coins >= 50 && knifeLevel === 1) {
+                coins -= 50;
+                knifeLevel = 2;
+                coinsDisplay.textContent = coins;
+                buyKnifeBtn.disabled = true;
+                buyKnifeBtn.textContent = 'Dibeli ✓';
+                buyKnifeBtn.className = 'bg-slate-300 text-slate-600 font-bold px-3 py-1.5 rounded-xl text-xs';
+                chefQuote.textContent = '"Kelajuan memotong bertambah 2x pantas! 🔪"';
+            }
+        };
+
+        buyStoveBtn.onclick = () => {
+            if (coins >= 80 && stoveLevel === 1) {
+                coins -= 80;
+                stoveLevel = 2;
+                coinsDisplay.textContent = coins;
+                buyStoveBtn.disabled = true;
+                buyStoveBtn.textContent = 'Dibeli ✓';
+                buyStoveBtn.className = 'bg-slate-300 text-slate-600 font-bold px-3 py-1.5 rounded-xl text-xs';
+                chefQuote.textContent = '"Dapur memasak kini lebih berkuasa! 🍳"';
+            }
+        };
+
+        buyCrownBtn.onclick = () => {
+            if (coins >= 150 && !hasCrown) {
+                coins -= 150;
+                hasCrown = true;
+                coinsDisplay.textContent = coins;
+                buyCrownBtn.disabled = true;
+                buyCrownBtn.textContent = 'Dibeli ✓';
+                buyCrownBtn.className = 'bg-slate-300 text-slate-600 font-bold px-3 py-1.5 rounded-xl text-xs';
+                outfitBadge.textContent = 'Topi: Mahkota Raja 👑';
+                chefQuote.textContent = '"Chef kini memakai Mahkota Raja! (+20% Syiling) 👑"';
+            }
+        };
+
+        // --- Start Game ---
+        startGameBtn.onclick = () => {
+            audio.init();
+            startOverlay.classList.add('hidden');
+            initRecipeSelector();
+            resetPreparation();
+            spawnCustomer();
+            spawnCustomer();
+        };
+    </script>
+</body>
+</html>
